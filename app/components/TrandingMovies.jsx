@@ -1,25 +1,47 @@
-import "@/style/global.css";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
   Dimensions,
   Image,
   Text,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 let { width, height } = Dimensions.get("window");
 
-export default function TrandingMovies(props) {
+export default function TrandingMovies({ data }) {
+  const navigation = useNavigation();
+
+  const handleClick = (item) => {
+    if (item && typeof item === "object") {
+      navigation.navigate("Movie", item);
+    } else {
+      console.warn("Invalid item passed to navigation:", {item});
+    }
+  };
+
   return (
-    <View className="mb-8 ">
-      <Text className="text-white text-xl mx-4 mb-5">Tranding</Text>
+    <View className="mb-8">
+      <Text className="text-white text-2xl mx-4 mb-5">Trending</Text>
+
       <Carousel
-        data={props.data}
-        renderItem={({ item }) => <MovieCard item={item} />}
-        firstItem={1}
+        loop={true}
         width={width}
+        height={height * 0.45}
+        data={data}
+        mode={"horizontal-stack"}
+        modeConfig={{
+          snapDirection: "left",
+          stackInterval: 18,
+        }}
+        pagingEnabled={true}
+        snapEnabled={true}
+        renderItem={({ item }) => (
+          <MovieCard item={item} handleClick={handleClick} />
+        )}
+        firstItem={1}
         inactiveSlideScale={0.6}
         sliderWidth={width}
         itemWidth={width * 0.62}
@@ -29,17 +51,25 @@ export default function TrandingMovies(props) {
   );
 }
 
-const MovieCard = ({ item }) => {
+const MovieCard = ({ item, handleClick }) => {
   return (
-    <TouchableWithoutFeedback>
-      <Image
-        source={require("@/assets/images/1092424.jpg")}
-        style={{
-          width: width * 0.6,
-          height: height * 0.4,
-        }}
-        className="rounded-3xl"
-      />
-    </TouchableWithoutFeedback>
+    <View
+      style={{
+        width,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <TouchableWithoutFeedback onPress={() => handleClick(item)}>
+        <Image
+          source={require("@/assets/images/1092424.jpg")}
+          style={{
+            width: width * 0.6,
+            height: height * 0.4,
+            borderRadius: 20,
+          }}
+        />
+      </TouchableWithoutFeedback>
+    </View>
   );
 };

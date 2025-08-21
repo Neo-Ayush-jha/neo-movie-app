@@ -1,31 +1,33 @@
-import HomeScreen from "@/app/screen/HomeScreen";
-import SecondScreen from "@/app/screen/Seco";
+import HomeScreen from "@/app/(tabs)/HomeScreen";
+import MovieScreen from "@/app/(tabs)/MovieScreen";
 import "@/style/global.css";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 const TabNavigator = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen
         name="Home"
         component={HomeScreen}
         options={{
           headerShown: false,
         }}
       />
-      <Tab.Screen
-        name="Second"
-        component={SecondScreen}
+      <Stack.Screen
+        name="Movie"
+        component={MovieScreen}
         options={{
           headerShown: false,
         }}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 };
 
 export default function Index() {
-  return <TabNavigator />;
+  return (
+      <TabNavigator />
+  );
 }

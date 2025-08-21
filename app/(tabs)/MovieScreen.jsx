@@ -3,14 +3,14 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { ChevronLeftIcon, HeartIcon } from "react-native-heroicons/solid";
 import MovieList from "../components/MovieList";
@@ -59,7 +59,7 @@ export default function MovieScreen() {
           <Image
             source={require("@/assets/images/1092424.jpg")}
             className=""
-            style={{ width: width, height: height * 0.65 }}
+            style={{ width: width, height: height * 0.69 }}
             // resizeMode="cover"
           />
           <LinearGradient
@@ -107,7 +107,11 @@ export default function MovieScreen() {
       </View>
       <Cast cast={cast} navigation={navigation} />
 
-      <MovieList title="Similar Movies" hideSeeAll={true} data={similarMovies} />
+      <MovieList
+        title="Similar Movies"
+        hideSeeAll={true}
+        data={similarMovies}
+      />
     </ScrollView>
   );
 }

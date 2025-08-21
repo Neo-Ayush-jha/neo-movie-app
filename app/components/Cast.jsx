@@ -5,7 +5,7 @@ export default function Cast({ cast,navigation }) {
   let personName = "Christian Bale";
   let characterName = "Bruce Wayne / Batman";
   return (
-    <View className="my-4">
+    <View className="mt-4 mb-6">
       <Text className="text-white text-xl mx-4 mb-5">Top Cast</Text>
       <ScrollView
         horizontal

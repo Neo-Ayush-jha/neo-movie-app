@@ -1,7 +1,10 @@
 import axios from "axios";
-import { apiKey } from "../constants/index";
+// import { apiKey } from "../constants/index";
 const apiBaseUrl = "https://imdb236.p.rapidapi.com";
 
+const apiKey = "0ce0e6feaemsh3dc7be47c0c37e7p105246jsn0cdbd5c92a51";
+// const apiKey = "bf059c65e0msh5774b16b0638e3fp1d4c97jsn3d0679f9d11a";
+// const apiKey = "8895af2febmsh60f0ec114d7b500p1d5b82jsnf06ae2fbbcc4";
 
 
 export const getImageUrl = (item, size = "medium") => {

@@ -13,16 +13,21 @@ import {
 let { width, height } = Dimensions.get("window");
 
 export default function MovieList({ title, data, hideSeeAll }) {
-  let movieName = "The Dark Knight Rises";
   const navigation = useNavigation();
 
+  
   const handleClick = (item) => {
-    navigation.push("Movie", { movie: item });
+    if (item && typeof item === "object") {
+      console.log('items',item?.id)
+      navigation.navigate("Movie", {item});
+    } else {
+      console.warn("Invalid item passed to navigation:", {item});
+    }
   };
 
   return (
     <View className="mb-8 space-y-4">
-      <View className="mx-4 flex-row justify-between items-center">
+      <View className="mx-4 flex-row justify-between items-center mb-4">
         <Text className="text-white text-2xl">{title}</Text>
         {!hideSeeAll && (
           <TouchableOpacity>
@@ -46,20 +51,32 @@ export default function MovieList({ title, data, hideSeeAll }) {
             >
               <View>
                 <View className="space-y-1 mr-4">
-                  <Image
-                    source={require("@/assets/images/1092424.jpg")}
-                    className="rounded-3xl"
-                    style={{
-                      width: width * 0.6,
-                      height: height * 0.4,
-                      borderRadius: 20,
-                    }}
-                  />
+                  {item?.primaryImage ? (
+                    <Image
+                      source={{ uri: item.primaryImage }}
+                      className="rounded-3xl"
+                      style={{
+                        width: width * 0.6,
+                        height: height * 0.4,
+                        borderRadius: 20,
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      source={require("@/assets/images/1092424.jpg")}
+                      className="rounded-3xl"
+                      style={{
+                        width: width * 0.6,
+                        height: height * 0.4,
+                        borderRadius: 20,
+                      }}
+                    />
+                  )}
                 </View>
                 <Text className="text-neutral-300 ml-1 text-center mt-1 text-lg">
-                  {movieName.length > 14
-                    ? movieName.slice(0, 14) + "..."
-                    : movieName}
+                  {item?.primaryTitle?.length > 14
+                    ? item?.primaryTitle.slice(0, 14) + "..."
+                    : item?.primaryTitle}
                 </Text>
               </View>
             </TouchableWithoutFeedback>

@@ -13,22 +13,74 @@ import {
   View,
 } from "react-native";
 import { ChevronLeftIcon, HeartIcon } from "react-native-heroicons/solid";
+import Loading from "../components/Loading";
 import MovieList from "../components/MovieList";
+import { fetchMovieCast, fetchMovieWriter } from "../utils/moviedb";
 
 let { width, height } = Dimensions.get("window");
 const ios = Platform.OS == "ios";
 const topMargin = ios ? "" : "mt-3";
 
 export default function MovieScreen() {
-  let movieName = "The Dark Knight Rises";
+  // let movieName = "The Dark Knight Rises";
   const route = useRoute();
-  const { params: item } = route.params;
+  const { item } = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
   const [cast, setCast] = useState([1, 2, 3, 4, 5]);
+  const [writer, setWriter] = useState([1, 2, 3, 4, 5]);
   const [similarMovies, setSimilarMovies] = useState([1, 2, 3, 4, 5]);
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
-  useEffect(() => {}, [item]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([getCastMovies(item?.id), getWriterMovies(item?.id)]);
+      } catch (error) {
+        console.error("Error loading movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (item?.id) {
+      fetchData();
+
+      // console.log("items---", item);
+    }
+  }, [item]);
+
+  const getCastMovies = async (id) => {
+    setLoading(true);
+    try {
+
+      const trending = await fetchMovieCast(id);
+      if (trending) {
+        setCast(trending);
+        // console.log("Cast Movies:", trending);
+      }
+    } catch (error) {
+      console.error("Error fetching cast movies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getWriterMovies = async (id) => {
+    setLoading(true);
+    try {
+
+      const trending = await fetchMovieWriter(id);
+      if (trending) {
+        setWriter(trending);
+        // console.log("Cast Movies:", trending);
+      }
+    } catch (error) {
+      console.error("Error fetching cast movies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView
@@ -55,57 +107,61 @@ export default function MovieScreen() {
           </TouchableOpacity>
         </SafeAreaView>
 
-        <View>
-          <Image
-            source={require("@/assets/images/1092424.jpg")}
-            className=""
-            style={{ width: width, height: height * 0.69 }}
-            // resizeMode="cover"
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(23,23,23,0.8)", "rgba(23,23,23,1)"]}
-            style={{
-              width: width,
-              height: height * 0.4,
-            }}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            className="absolute bottom-0"
-          />
-        </View>
+        {loading ? (
+          <Loading />
+        ) : (
+          <View>
+            <Image
+              source={{ uri: item?.primaryImage }}
+              className=""
+              style={{ width: width, height: height * 0.69 }}
+              // resizeMode="cover"
+            />
+            <LinearGradient
+              colors={["transparent", "rgba(23,23,23,0.8)", "rgba(23,23,23,1)"]}
+              style={{
+                width: width,
+                height: height * 0.4,
+              }}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              className="absolute bottom-0"
+            />
+          </View>
+        )}
       </View>
 
       <View style={{ marginTop: -(height * 0.09) }} className="space-y-4 ">
         <Text className="text-white text-4xl tracking-wide font-bold text-center">
-          {movieName}
+          {item?.originalTitle}
         </Text>
         <Text className="text-neutral-400 font-semibold text-base text-center py-4">
-          Released • 2020 • 170 min
+          Released • {item?.releaseDate} •{" "}
+          {item?.runtimeMinutes === null
+            ? "170 min"
+            : `${item.runtimeMinutes} min`}
         </Text>
 
-        <View className="flex-row justify-center mx-4 space-x-2 ">
-          <Text className="text-neutral-400 font-semibold text-base text-center">
-            Action •
-          </Text>
-          <Text className="text-neutral-400 font-semibold text-base text-center ">
-            Thriller •
-          </Text>
-          <Text className="text-neutral-400 font-semibold text-base text-center">
-            Comedy •
-          </Text>
+        <View className="flex-row justify-center mx-4 space-x-2">
+          {item?.genres.map((genre, index) => (
+            <Text
+              key={index}
+              className="text-neutral-400 font-semibold text-base text-center"
+            >
+              {genre}
+              {index < item.genres.length - 1 ? " •" : ""}
+            </Text>
+          ))}
         </View>
 
         <Text className="text-neutral-400 mx-4 tracking-wide pt-4">
-          The Dark Knight (2008), directed by Christopher Nolan, is a
-          masterpiece in superhero cinema. The film follows Batman as he battles
-          chaos unleashed by the Joker, a criminal mastermind who thrives on
-          fear and anarchy.Batman has a new foe, the Joker, who is an
-          accomplished criminal hell-bent on decimating Gotham City. Together
-          with Gordon and Harvey Dent, Batman struggles to thwart the Joker
-          before it is too late.
+          {item?.description?.length > 300
+            ? item?.description.slice(0, 300) + "..."
+            : item?.description}
         </Text>
       </View>
-      <Cast cast={cast} navigation={navigation} />
+      <Cast title="Top Cast" cast={cast} navigation={navigation} />
+      <Cast title="Writers" cast={writer} navigation={navigation} />
 
       <MovieList
         title="Similar Movies"

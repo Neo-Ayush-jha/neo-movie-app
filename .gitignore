@@ -36,4 +36,4 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-./app/utils/moviedb.jsx
+*./app/utils/moviedb.jsx

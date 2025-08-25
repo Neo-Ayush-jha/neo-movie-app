@@ -25,7 +25,7 @@ export default function Cast({ cast, navigation, title }) {
         ).map((person, index) => {
           const isRapidApi = typeof person === "object";
 
-          const name = isRapidApi ? person?.fullName : person?.trim();
+          const name = isRapidApi ? person?.fullName : "";
           const image =
             isRapidApi && (person?.thumbnails?.[1]?.url || person?.primaryImage)
               ? person?.thumbnails?.[1]?.url || person?.primaryImage

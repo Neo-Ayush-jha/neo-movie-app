@@ -17,8 +17,8 @@ export default function MovieList({ title, data, hideSeeAll }) {
 
   const handleClick = (item) => {
     if (item && typeof item === "object") {
-      // console.log("items", item?.id);
-      console.log("items", item?.imdbID);
+      console.log("items", item);
+      // console.log("items", item?.imdbID);
       navigation.navigate("Movie", { item });
     } else {
       console.warn("Invalid item passed to navigation:", { item });

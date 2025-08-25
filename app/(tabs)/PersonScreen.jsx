@@ -26,7 +26,7 @@ export default function PersonScreen() {
   const navigation = useNavigation();
   const [personMovies, setPersonMovies] = useState([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
-  // console.log("Person Screen", person);
+  console.log("Person Screen", personMovies);
 
   const handleOpenUrl = () => {
     if (person?.url) {

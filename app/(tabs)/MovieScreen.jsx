@@ -35,7 +35,7 @@ export default function MovieScreen() {
   const [similarMovies, setSimilarMovies] = useState([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
 
-  // console.log("Movie Screen", cast);
+  console.log("Movie Screen", item);
 
   const navigation = useNavigation();
   useEffect(() => {

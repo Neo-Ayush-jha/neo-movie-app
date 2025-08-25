@@ -12,7 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ChevronLeftIcon, HeartIcon } from "react-native-heroicons/solid";
+import {
+  ChevronLeftIcon,
+  HeartIcon,
+  StarIcon,
+} from "react-native-heroicons/solid";
 import Loading from "../components/Loading";
 import MovieList from "../components/MovieList";
 import { fetchMovieCast, fetchMovieWriter } from "../utils/moviedb";
@@ -31,12 +35,18 @@ export default function MovieScreen() {
   const [similarMovies, setSimilarMovies] = useState([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
 
+  // console.log("Movie Screen", cast);
+
   const navigation = useNavigation();
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([getCastMovies(item?.id), getWriterMovies(item?.id)]);
+        // await Promise.all([getCastMovies(item?.id), getWriterMovies(item?.id)]);
+        await Promise.all([
+          getCastMovies(item?.imdbID || item?.id),
+          getWriterMovies(item?.imdbID || item?.id),
+        ]);
       } catch (error) {
         console.error("Error loading movies:", error);
       } finally {
@@ -44,7 +54,8 @@ export default function MovieScreen() {
       }
     };
 
-    if (item?.id) {
+    // if (item?.id) {
+    if (item?.imdbID || item?.id) {
       fetchData();
 
       // console.log("items---", item);
@@ -54,7 +65,6 @@ export default function MovieScreen() {
   const getCastMovies = async (id) => {
     setLoading(true);
     try {
-
       const trending = await fetchMovieCast(id);
       if (trending) {
         setCast(trending);
@@ -69,19 +79,33 @@ export default function MovieScreen() {
   const getWriterMovies = async (id) => {
     setLoading(true);
     try {
-
       const trending = await fetchMovieWriter(id);
       if (trending) {
         setWriter(trending);
-        // console.log("Cast Movies:", trending);
+        // console.log("Writer Movies:", trending);
       }
     } catch (error) {
-      console.error("Error fetching cast movies:", error);
+      console.error("Error fetching writer movies:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const getRatingValue = (rating) => {
+    let value = rating.Value;
+    if (value.includes("/10")) {
+      return (parseFloat(value) / 10) * 5;
+    } else if (value.includes("%")) {
+      return (parseFloat(value) / 100) * 5;
+    } else if (value.includes("/100")) {
+      return (parseFloat(value) / 100) * 5;
+    }
+    return 0;
+  };
+  const getImdbStars = (val) => {
+    if (!val) return 0;
+    return (parseFloat(val) / 10) * 5;
+  };
   return (
     <ScrollView
       contentContainerStyle={{ paddingBottom: 20 }}
@@ -113,6 +137,7 @@ export default function MovieScreen() {
           <View>
             <Image
               source={{ uri: item?.primaryImage }}
+              // source={{ uri: item?.Poster || item?.primaryImage }}
               className=""
               style={{ width: width, height: height * 0.69 }}
               // resizeMode="cover"
@@ -133,17 +158,83 @@ export default function MovieScreen() {
 
       <View style={{ marginTop: -(height * 0.09) }} className="space-y-4 ">
         <Text className="text-white text-4xl tracking-wide font-bold text-center">
-          {item?.originalTitle}
-        </Text>
-        <Text className="text-neutral-400 font-semibold text-base text-center py-4">
-          Released • {item?.releaseDate} •{" "}
-          {item?.runtimeMinutes === null
-            ? "170 min"
-            : `${item.runtimeMinutes} min`}
+          {item?.Title || item?.originalTitle}
         </Text>
 
+        <View className=" py-4">
+          <Text className="text-neutral-400 font-semibold text-base text-center">
+            Released • {cast?.Released || item?.releaseDate} •{" "}
+            {item?.runtimeMinutes === null
+              ? "170 min"
+              : `${cast?.Runtime || item?.runtimeMinutes} min`}
+          </Text>
+          {cast?.Genre && (
+            <Text className="text-neutral-400 font-semibold text-base text-center">
+              Genre • {cast?.Genre ? cast.Genre.split(",").join(" • ") : ""}
+            </Text>
+          )}
+          {cast?.Language && (
+            <Text className="text-neutral-400 font-semibold text-base text-center">
+              Language • {cast?.Language}{" "}
+              {cast?.BoxOffice ? ` • Box Office • ${cast.BoxOffice}` : ""}
+            </Text>
+          )}
+          {cast?.Ratings && (
+            <View className="mx-md">
+              <Text className="text-white font-bold text-md px-8">
+                Ratings:
+              </Text>
+              {cast?.Ratings?.map((rating, index) => {
+                const starValue = getRatingValue(rating);
+                const filledStars = Math.round(starValue);
+
+                return (
+                  <View key={index} className="flex-row px-12 gap-4 ">
+                    <Text className="text-neutral-400 font-semibold text-base text-center">
+                      {rating.Source}
+                    </Text>
+                    <View className="flex-row">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <StarIcon
+                          key={i}
+                          name="star"
+                          size={20}
+                          color={i <= filledStars ? "gold" : "gray"}
+                          style={{ marginRight: 2 }}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                );
+              })}
+              {cast?.imdbRating && (
+                <View className="flex-row px-12 gap-4 ">
+                  <Text className="text-neutral-400 font-semibold text-base text-center">
+                    IMDb Rating
+                  </Text>
+                  <View className="flex-row">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <StarIcon
+                        key={i}
+                        name="star"
+                        size={20}
+                        color={
+                          i <= Math.round(getImdbStars(cast?.imdbRating))
+                            ? "gold"
+                            : "gray"
+                        }
+                        style={{ marginRight: 2 }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+
         <View className="flex-row justify-center mx-4 space-x-2">
-          {item?.genres.map((genre, index) => (
+          {item?.genres?.map((genre, index) => (
             <Text
               key={index}
               className="text-neutral-400 font-semibold text-base text-center"
@@ -154,6 +245,11 @@ export default function MovieScreen() {
           ))}
         </View>
 
+        <Text className="text-neutral-400 mx-4 tracking-wide pt-4">
+          {item?.description?.length > 300
+            ? cast?.Plot.slice(0, 300) + "..."
+            : cast?.Plot}
+        </Text>
         <Text className="text-neutral-400 mx-4 tracking-wide pt-4">
           {item?.description?.length > 300
             ? item?.description.slice(0, 300) + "..."

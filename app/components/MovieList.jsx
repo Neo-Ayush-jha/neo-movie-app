@@ -15,13 +15,13 @@ let { width, height } = Dimensions.get("window");
 export default function MovieList({ title, data, hideSeeAll }) {
   const navigation = useNavigation();
 
-  
   const handleClick = (item) => {
     if (item && typeof item === "object") {
-      console.log('items',item?.id)
-      navigation.navigate("Movie", {item});
+      // console.log("items", item?.id);
+      console.log("items", item?.imdbID);
+      navigation.navigate("Movie", { item });
     } else {
-      console.warn("Invalid item passed to navigation:", {item});
+      console.warn("Invalid item passed to navigation:", { item });
     }
   };
 
@@ -51,9 +51,9 @@ export default function MovieList({ title, data, hideSeeAll }) {
             >
               <View>
                 <View className="space-y-1 mr-4">
-                  {item?.primaryImage ? (
+                  {item?.Poster !== "N/A" && item?.primaryImage ? (
                     <Image
-                      source={{ uri: item.primaryImage }}
+                      source={{ uri: item?.Poster || item?.primaryImage }}
                       className="rounded-3xl"
                       style={{
                         width: width * 0.6,
@@ -73,10 +73,15 @@ export default function MovieList({ title, data, hideSeeAll }) {
                     />
                   )}
                 </View>
+
                 <Text className="text-neutral-300 ml-1 text-center mt-1 text-lg">
-                  {item?.primaryTitle?.length > 14
+                  {(item?.Title?.length || item?.primaryTitle?.length) > 14
+                    ? (item?.Title?.slice(0, 14) ||
+                        item?.primaryTitle?.slice(0, 14)) + "..."
+                    : item?.Title || item?.primaryTitle}
+                  {/* {item?.primaryTitle?.length > 14
                     ? item?.primaryTitle.slice(0, 14) + "..."
-                    : item?.primaryTitle}
+                    : item?.primaryTitle} */}
                 </Text>
               </View>
             </TouchableWithoutFeedback>

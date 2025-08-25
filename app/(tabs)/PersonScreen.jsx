@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import {
   Dimensions,
   Image,
+  Linking,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -25,8 +26,15 @@ export default function PersonScreen() {
   const navigation = useNavigation();
   const [personMovies, setPersonMovies] = useState([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
-  console.log("Person Screen", person);
-  
+  // console.log("Person Screen", person);
+
+  const handleOpenUrl = () => {
+    if (person?.url) {
+      Linking.openURL(person.url).catch((err) =>
+        console.error("Failed to open URL:", err)
+      );
+    }
+  };
 
   return (
     <ScrollView
@@ -86,21 +94,29 @@ export default function PersonScreen() {
             <View className="font-semibold text-white border-r-2 border-r-neutral-400 px-2 items-center">
               <Text className="text-white font-semibold">
                 {person?.characters?.length > 0
-                  ? person?.characters
-                  : person?.fullName}
+                  ? person?.characters.slice(0, 20) + "..."
+                  : person?.characters}
               </Text>
               <Text className="text-sm text-neutral-300 caption-top">
-                {person?.job}
+                Character name
               </Text>
             </View>
-            <View className="font-semibold text-white border-r-2 border-r-neutral-400 px-2 items-center">
-              <Text className="text-white font-semibold">Christian Bale</Text>
-              <Text className="text-sm text-neutral-300">Actor</Text>
+            <View className="font-semibold text-white border-r-2 border-r-neutral-400 px-2 items-center ">
+              <Text className="text-white font-semibold capitalize">{person?.job}</Text>
+              {/* <Text className="text-sm text-neutral-300">{person?.job}</Text> */}
             </View>
-            <View className="px-2 items-center">
-              <Text className="text-white font-semibold">Christian Bale</Text>
-              <Text className="text-sm text-neutral-300">Actor</Text>
-            </View>
+            {/* This is the new clickable section */}
+            <TouchableOpacity
+              className="px-2 items-center"
+              onPress={handleOpenUrl}
+            >
+              <Text className="text-white font-semibold">
+                {person?.url?.length > 15
+                  ? person?.url.slice(0, 15) + "...."
+                  : person?.url}
+              </Text>
+              <Text className="text-sm text-neutral-300">More Details</Text>
+            </TouchableOpacity>
           </View>
           <View className="my-6 mx-4 space-y-4">
             <Text className="text-white">Biography</Text>
@@ -124,7 +140,6 @@ export default function PersonScreen() {
               accolades, including Academy Awards and Golden Globe
             </Text>
           </View>
-
           <MovieList title={"Movies"} hideSeeAll={true} data={personMovies} />
         </View>
       )}

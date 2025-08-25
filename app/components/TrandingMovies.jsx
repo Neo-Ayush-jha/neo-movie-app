@@ -14,10 +14,10 @@ let { width, height } = Dimensions.get("window");
 export default function TrandingMovies({ data }) {
   const navigation = useNavigation();
 
-    
+  
   const handleClick = (item) => {
     if (item && typeof item === "object") {
-      console.log('items',item?.id)
+      // console.log('items', item?.id)
       navigation.navigate("Movie", {item});
     } else {
       console.warn("Invalid item passed to navigation:", {item});
@@ -64,7 +64,7 @@ const MovieCard = ({ item, handleClick }) => {
     >
       <TouchableWithoutFeedback onPress={() => handleClick(item)}>
         <Image
-          source={{ uri: item?.primaryImage }}
+          source={{ uri: item?.Poster || item?.primaryImage }}
           style={{
             width: width * 0.6,
             height: height * 0.4,

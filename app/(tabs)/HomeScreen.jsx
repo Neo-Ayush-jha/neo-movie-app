@@ -22,11 +22,11 @@ import {
   fetchTopRatedMovies,
   fetchTrendingMovies,
   fetchUpcomingMovies,
+  normalizeMovies,
 } from "../utils/moviedb";
 
 const ios = Platform.OS === "ios";
 const HomeScreen = () => {
-
   const [loading, setLoading] = React.useState(false);
 
   const [trandingMovies, setTrandingMovies] = React.useState([]);
@@ -58,10 +58,7 @@ const HomeScreen = () => {
     setLoading(true);
     try {
       const trending = await fetchTrendingMovies();
-      if (trending) {
-        setTrandingMovies(trending?.results);
-        // console.log("Trending Movies:", trending.results);
-      }
+      setTrandingMovies(normalizeMovies(trending));
     } catch (error) {
       console.error("Error fetching trending movies:", error);
     } finally {
@@ -69,38 +66,31 @@ const HomeScreen = () => {
     }
   };
 
-  // 🔹 Upcoming Movies
+  // Upcoming Movies
   const getUpcomingMovies = async () => {
     setLoading(true);
     try {
       const upcomingMovies = await fetchUpcomingMovies();
-      if (upcomingMovies) {
-        setUpcoming(upcomingMovies?.results || upcomingMovies);
-        // console.log("Upcoming Movies:", upcomingMovies);
-      }
+      setUpcoming(normalizeMovies(upcomingMovies));
     } catch (error) {
       console.error("Error fetching upcoming movies:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 Top Rated Movies
+  // Top Rated Movies
   const getTopRatedMovies = async () => {
     setLoading(true);
     try {
       const topRatedMovies = await fetchTopRatedMovies();
-      if (topRatedMovies) {
-        setTopRated(topRatedMovies?.results || topRatedMovies);
-        // console.log("Top Rated Movies:", topRatedMovies);
-      }
+      setTopRated(normalizeMovies(topRatedMovies));
     } catch (error) {
       console.error("Error fetching top rated movies:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
-
   return (
     <View className="bg-neutral-800 flex-1 pt-16 h-full">
       <SafeAreaView className={ios ? "-mb-2" : "mb-3"}>
